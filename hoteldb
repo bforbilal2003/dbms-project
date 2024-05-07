@@ -23,4 +23,17 @@ CREATE TABLE reservation (
     FOREIGN KEY (reservationID) REFERENCES reservationId(id)
 );
 
+CREATE TABLE delux (
+    reservationID INT PRIMARY KEY,
+    price INT,
+    isAvailable BOOLEAN,
+    maxNoOfPeople INT
+);
+
+CREATE TABLE premium (
+    reservationID INT PRIMARY KEY,
+    price INT,
+    isAvailable BOOLEAN,
+    maxNoOfPeople INT
+);
 
