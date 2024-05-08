@@ -5,6 +5,8 @@ CREATE TABLE "User" (
     lastLogin DATE
 );
 
+CREATE INDEX user_name_index ON "User" (name);
+
 CREATE TABLE reservationId (
     id SERIAL PRIMARY KEY
 );
@@ -22,6 +24,9 @@ CREATE TABLE reservation (
     FOREIGN KEY (reservedBy) REFERENCES "User"(email),
     FOREIGN KEY (reservationID) REFERENCES reservationId(id)
 );
+
+CREATE INDEX reservation_reservedBy_index ON reservation (reservedBy);
+CREATE INDEX reservation_roomType_index ON reservation (roomType);
 
 CREATE TABLE delux (
     reservationID INT PRIMARY KEY,
