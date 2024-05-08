@@ -37,3 +37,13 @@ CREATE TABLE premium (
     maxNoOfPeople INT
 );
 
+CREATE TABLE suite (
+    reservationID INT PRIMARY KEY,
+    price INT,
+    isAvailable BOOLEAN,
+    maxNoOfPeople INT
+);
+
+INSERT INTO delux VALUES(1, 100, true, 2);
+INSERT INTO premium VALUES(1, 500, true, 4);
+INSERT INTO suite VALUES(1, 1000, true, 5);
