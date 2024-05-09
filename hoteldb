@@ -5,18 +5,18 @@ CREATE TABLE "User" (
     lastLogin DATE
 );
 
-CREATE INDEX user_name_index ON "User" (name);
+CREATE INDEX user_email_index ON "User" (email);
 
 CREATE TABLE reservationId (
-    id SERIAL PRIMARY KEY
+    id INT PRIMARY KEY
 );
 
-INSERT INTO reservationId DEFAULT VALUES;
+INSERT INTO reservationId VALUES(120);
 
 INSERT INTO "User" VALUES('ctfce', 'rfc', 'rcf', '2022-02-20');
 
 CREATE TABLE reservation (
-    reservationID SERIAL PRIMARY KEY,
+    reservationID INT PRIMARY KEY,
     reservedBy VARCHAR(30),
     roomType VARCHAR(20),
     reservationDate DATE,
@@ -26,7 +26,7 @@ CREATE TABLE reservation (
 );
 
 CREATE INDEX reservation_reservedBy_index ON reservation (reservedBy);
-CREATE INDEX reservation_roomType_index ON reservation (roomType);
+CREATE INDEX reservation_reservationID_index ON reservation (reservationID);
 
 CREATE TABLE delux (
     reservationID INT PRIMARY KEY,
@@ -52,3 +52,18 @@ CREATE TABLE suite (
 INSERT INTO delux VALUES(1, 100, true, 2);
 INSERT INTO premium VALUES(1, 500, true, 4);
 INSERT INTO suite VALUES(1, 1000, true, 5);
+
+CREATE OR REPLACE FUNCTION UpdateReservationIdTrigger()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO reservation (reservationID, reservedBy, roomType, reservationDate, checkoutDate)
+    VALUES (NEW.id, NULL, NULL, NULL, NULL);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_reservation_id_trigger
+AFTER UPDATE ON reservationId
+FOR EACH ROW
+EXECUTE FUNCTION UpdateReservationIdTrigger();
+
