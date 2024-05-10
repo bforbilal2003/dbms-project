@@ -1,11 +1,11 @@
-CREATE TABLE "User" (
-    email VARCHAR(30) PRIMARY KEY,
-    name VARCHAR(20),
-    password VARCHAR(30),
-    lastLogin DATE
+CREATE TABLE User1 (
+    email VARCHAR(255) PRIMARY KEY NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+	lastLogin TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX user_email_index ON "User" (email);
+CREATE INDEX user_email_idx ON 1User1 (email);
 
 CREATE TABLE reservationId (
     id INT PRIMARY KEY
@@ -21,7 +21,7 @@ CREATE TABLE reservation (
     roomType VARCHAR(20),
     reservationDate DATE,
     checkoutDate DATE,
-    FOREIGN KEY (reservedBy) REFERENCES "User"(email),
+    FOREIGN KEY (reservedBy) REFERENCES User1(email),
     FOREIGN KEY (reservationID) REFERENCES reservationId(id)
 );
 
@@ -85,6 +85,11 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER insert_into_room_tables_trigger
+AFTER INSERT ON reservation
+FOR EACH ROW
+EXECUTE FUNCTION InsertIntoRoomTables();
 
 CREATE TRIGGER insert_into_room_tables_trigger
 AFTER INSERT ON reservation
