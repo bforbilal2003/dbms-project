@@ -1,6 +1,7 @@
 # dbms-project
-semester project  
+
+Our semester project details creating a Hotel Reservation Database Management System in PostgreSQL using SQL. 
 
 
 
-file user.py contains the user interface
+
