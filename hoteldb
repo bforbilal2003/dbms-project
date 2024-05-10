@@ -95,3 +95,31 @@ CREATE TRIGGER insert_into_room_tables_trigger
 AFTER INSERT ON reservation
 FOR EACH ROW
 EXECUTE FUNCTION InsertIntoRoomTables();
+
+CREATE OR REPLACE PROCEDURE GetUserReservationsCursor(
+    IN currentUserEmail VARCHAR(30)
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    user_reservation_cursor CURSOR FOR
+        SELECT u.email, u.name, r.reservationID, r.roomType, r.reservationDate, r.checkoutDate
+        FROM "User" u
+        INNER JOIN reservation r ON u.email = r.reservedBy
+        WHERE u.email = currentUserEmail;
+    row_record RECORD;
+BEGIN
+    -- Open the cursor
+    OPEN user_reservation_cursor;
+
+    -- Fetch rows from the cursor and return each row
+    FOR row_record IN user_reservation_cursor LOOP
+        -- Output each row to the result set
+        -- This is equivalent to RETURN NEXT in a set-returning function
+        SELECT row_record.email, row_record.name, row_record.reservationID, row_record.roomType, row_record.reservationDate, row_record.checkoutDate;
+    END LOOP;
+
+    -- Close the cursor
+    CLOSE user_reservation_cursor;
+END;
+$$;
