@@ -67,3 +67,26 @@ AFTER UPDATE ON reservationId
 FOR EACH ROW
 EXECUTE FUNCTION UpdateReservationIdTrigger();
 
+DELETE FROM reservationId WHERE id=100;
+
+CREATE OR REPLACE FUNCTION InsertIntoRoomTables()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (NEW.roomType = 'delux') THEN
+        INSERT INTO delux (reservationID, price, isAvailable, maxNoOfPeople)
+        VALUES (NEW.reservationID, 100, true, 2);
+    ELSIF (NEW.roomType = 'premium') THEN
+        INSERT INTO premium (reservationID, price, isAvailable, maxNoOfPeople)
+        VALUES (NEW.reservationID, 150, true, 4);
+    ELSE
+        INSERT INTO suite (reservationID, price, isAvailable, maxNoOfPeople)
+        VALUES (NEW.reservationID, 200, true, 6);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER insert_into_room_tables_trigger
+AFTER INSERT ON reservation
+FOR EACH ROW
+EXECUTE FUNCTION InsertIntoRoomTables();
