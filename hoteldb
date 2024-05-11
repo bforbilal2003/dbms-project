@@ -5,69 +5,42 @@ CREATE TABLE User1 (
 	lastLogin TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX user_email_idx ON 1User1 (email);
+CREATE INDEX user_email_idx ON User1 (email);
 
-CREATE TABLE reservationId (
-    id INT PRIMARY KEY
-);
-
-INSERT INTO reservationId VALUES(120);
-
-INSERT INTO "User" VALUES('ctfce', 'rfc', 'rcf', '2022-02-20');
+INSERT INTO User1 (email, name, password) VALUES ('testing@gmail.com', 'haseeb', 'hello123');
 
 CREATE TABLE reservation (
-    reservationID INT PRIMARY KEY,
+    reservationID BIGINT PRIMARY KEY,
     reservedBy VARCHAR(30),
     roomType VARCHAR(20),
     reservationDate DATE,
     checkoutDate DATE,
-    FOREIGN KEY (reservedBy) REFERENCES User1(email),
-    FOREIGN KEY (reservationID) REFERENCES reservationId(id)
+    FOREIGN KEY (reservedBy) REFERENCES User1 (email)
 );
 
-CREATE INDEX reservation_reservedBy_index ON reservation (reservedBy);
-CREATE INDEX reservation_reservationID_index ON reservation (reservationID);
+CREATE INDEX reservation_reservedBy_idx ON reservation (reservedBy);
+CREATE INDEX reservation_roomType_idx ON reservation (roomType);
 
 CREATE TABLE delux (
-    reservationID INT PRIMARY KEY,
-    price INT,
+    reservationID BIGINT PRIMARY KEY,
+    price BIGINT,
     isAvailable BOOLEAN,
     maxNoOfPeople INT
 );
 
 CREATE TABLE premium (
-    reservationID INT PRIMARY KEY,
-    price INT,
+    reservationID BIGINT PRIMARY KEY,
+    price BIGINT,
     isAvailable BOOLEAN,
     maxNoOfPeople INT
 );
 
 CREATE TABLE suite (
-    reservationID INT PRIMARY KEY,
-    price INT,
+    reservationID BIGINT PRIMARY KEY,
+    price BIGINT,
     isAvailable BOOLEAN,
     maxNoOfPeople INT
 );
-
-INSERT INTO delux VALUES(1, 100, true, 2);
-INSERT INTO premium VALUES(1, 500, true, 4);
-INSERT INTO suite VALUES(1, 1000, true, 5);
-
-CREATE OR REPLACE FUNCTION UpdateReservationIdTrigger()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO reservation (reservationID, reservedBy, roomType, reservationDate, checkoutDate)
-    VALUES (NEW.id, NULL, NULL, NULL, NULL);
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_reservation_id_trigger
-AFTER UPDATE ON reservationId
-FOR EACH ROW
-EXECUTE FUNCTION UpdateReservationIdTrigger();
-
-DELETE FROM reservationId WHERE id=100;
 
 CREATE OR REPLACE FUNCTION InsertIntoRoomTables()
 RETURNS TRIGGER AS $$
@@ -77,19 +50,14 @@ BEGIN
         VALUES (NEW.reservationID, 100, true, 2);
     ELSIF (NEW.roomType = 'premium') THEN
         INSERT INTO premium (reservationID, price, isAvailable, maxNoOfPeople)
-        VALUES (NEW.reservationID, 150, true, 4);
+        VALUES (NEW.reservationID, 500, true, 4);
     ELSE
         INSERT INTO suite (reservationID, price, isAvailable, maxNoOfPeople)
-        VALUES (NEW.reservationID, 200, true, 6);
+        VALUES (NEW.reservationID, 1000, true, 6);
     END IF;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
-CREATE TRIGGER insert_into_room_tables_trigger
-AFTER INSERT ON reservation
-FOR EACH ROW
-EXECUTE FUNCTION InsertIntoRoomTables();
 
 CREATE TRIGGER insert_into_room_tables_trigger
 AFTER INSERT ON reservation
